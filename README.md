@@ -67,3 +67,10 @@ Match address 192.168.1.0/24
 
 And restart sshd service
 ```
+
+
+
+## Thank 
+
+@hypersleep Vladislav Spirenkov
+https://github.com/hypersleep/easyssh
