@@ -9,7 +9,7 @@ Do not need to think about Dials, sessions, defers and public keys...Let easyssh
 ## Install
 
 
-```bash
+```go
 go get github.com/jniltinho/easyssh
 ```
 
