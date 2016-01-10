@@ -72,7 +72,7 @@ func main() {
 	} else {
 		println("success")
 
-		response, _ := ssh.Run("ls -al zipkin.rb")
+		response, _ := ssh.Run("ls -al goclientssh.go")
 
 		print(response)
 	}
