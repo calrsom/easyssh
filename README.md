@@ -47,3 +47,17 @@ func main() {
 ```
 
 [Upload a file to remote server](example/scp.go)
+
+
+## SSH Error
+
+```
+panic: Can't run remote command: ssh: handshake failed: 
+ssh: unable to authenticate, attempted methods [none], no supported methods remain
+```
+
+Change file: /etc/ssh/sshd_config
+FROM: **PasswordAuthentication no**
+TO: **PasswordAuthentication yes**
+
+And restart sshd service
