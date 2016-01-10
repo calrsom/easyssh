@@ -17,7 +17,7 @@ go get github.com/jniltinho/easyssh
 
 [Run a command on remote server and get STDOUT output](example/run.go)
 
-```
+```go
 package main
 
 import (
