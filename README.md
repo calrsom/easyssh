@@ -73,8 +73,10 @@ func main() {
 		println("success")
 
 		response, _ := ssh.Run("ls -al goclientssh.go")
-
 		print(response)
+		
+		// Move file
+		ssh.Run("mv ~/goclientssh.go ~/GO/src/")
 	}
 }
 ```
