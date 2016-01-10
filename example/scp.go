@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/jniltinho/easyssh"
 )
 
@@ -21,10 +20,10 @@ func main() {
 	if err != nil {
 		panic("Can't run remote command: " + err.Error())
 	} else {
-		fmt.Println("success")
+		println("success")
 
 		response, _ := ssh.Run("ls -al zipkin.rb")
 
-		fmt.Println(response)
+		print(response)
 	}
 }
