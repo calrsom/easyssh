@@ -72,5 +72,4 @@ And restart sshd service
 
 ## Thank 
 
-@hypersleep Vladislav Spirenkov
-https://github.com/hypersleep/easyssh
+@hypersleep: Vladislav Spirenkov -> https://github.com/hypersleep/easyssh
