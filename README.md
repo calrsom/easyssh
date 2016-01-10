@@ -6,6 +6,13 @@ Package easyssh provides a simple implementation of some SSH protocol features i
 You can simply run command on remote server or upload a file even simple than native console SSH client.
 Do not need to think about Dials, sessions, defers and public keys...Let easyssh will be think about it!
 
+## Install
+
+
+```bash
+go get github.com/jniltinho/easyssh
+```
+
 ## So easy to use!
 
 [Run a command on remote server and get STDOUT output](example/run.go)
