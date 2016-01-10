@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/jniltinho/easyssh"
 )
 
@@ -21,6 +20,6 @@ func main() {
 	if err != nil {
 		panic("Can't run remote command: " + err.Error())
 	} else {
-		fmt.Println(response)
+		print(response)
 	}
 }
