@@ -56,16 +56,17 @@ panic: Can't run remote command: ssh: handshake failed:
 ssh: unable to authenticate, attempted methods [none], no supported methods remain
 ```
 
-```
-Change file: /etc/ssh/sshd_config
-FROM: PasswordAuthentication no
-TO: PasswordAuthentication yes
+```bash
+## Change file: /etc/ssh/sshd_config
+sed -i 's|PasswordAuthentication no|PasswordAuthentication yes|' /etc/ssh/sshd_config
 
-Or
-Match address 192.168.1.0/24
-    PasswordAuthentication yes
 
-And restart sshd service
+## Or add the end of the file.
+## Match address 192.168.1.0/24
+##    PasswordAuthentication yes
+
+## And restart sshd service
+sudo service sshd restart
 ```
 
 
