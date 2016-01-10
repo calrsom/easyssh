@@ -53,7 +53,7 @@ func main() {
 
 ```
 panic: Can't run remote command: ssh: handshake failed: 
-ssh: unable to authenticate, attempted methods [none], no supported methods remain
+ssh: unable to authenticate, attempted methods [none publickey], no supported methods remain
 ```
 
 ```bash
