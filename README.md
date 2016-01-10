@@ -57,6 +57,7 @@ ssh: unable to authenticate, attempted methods [none], no supported methods rema
 ```
 
 Change file: /etc/ssh/sshd_config
+
 FROM: **PasswordAuthentication no**
 
 TO: **PasswordAuthentication yes**
