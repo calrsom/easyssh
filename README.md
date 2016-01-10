@@ -8,7 +8,7 @@ Do not need to think about Dials, sessions, defers and public keys...Let easyssh
 
 ## So easy to use!
 
-[Run a command on remote server and get STDOUT output](blob/master/example/run.go)
+[Run a command on remote server and get STDOUT output](example/run.go)
 
 ```
 package main
@@ -39,4 +39,4 @@ func main() {
 }
 ```
 
-[Upload a file to remote server](https://github.com/hypersleep/easyssh/blob/master/example/scp.go)
+[Upload a file to remote server](example/scp.go)
