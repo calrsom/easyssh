@@ -40,7 +40,7 @@ func main() {
 	if err != nil {
 		panic("Can't run remote command: " + err.Error())
 	} else {
-		println(response)
+		print(response)
 	}
 }
 ```
