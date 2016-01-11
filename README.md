@@ -30,7 +30,6 @@ func main() {
 		User:   "user1",
 		Server: "server.example.com",
 		Password:  "<user1password>",
-		Port: "22",
 	}
 
 	// Call Run method with command you want to run on remote server.
@@ -60,7 +59,6 @@ func main() {
 		User:   "user1",
 		Server: "server.example.com",
 		Password:  "<user1password>",
-		Port: "22",
 	}
 
 	// Call Scp method with file you want to upload to remote server.
