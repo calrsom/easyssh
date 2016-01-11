@@ -26,11 +26,7 @@ import (
 
 func main() {
 	// Create MakeConfig instance with remote username, server address and path to private key.
-	ssh := &easyssh.MakeConfig{
-		User:   "user1",
-		Server: "server.example.com",
-		Password:  "<user1password>",
-	}
+	ssh := &easyssh.MakeConfig{User: "user1", Server: "server.example.com", Password: "<user1password>"}
 
 	// Call Run method with command you want to run on remote server.
 	response, err := ssh.Run("ps ax")
@@ -55,11 +51,7 @@ import (
 
 func main() {
 	// Create MakeConfig instance with remote username, server address and path to private key.
-	ssh := &easyssh.MakeConfig{
-		User:   "user1",
-		Server: "server.example.com",
-		Password:  "<user1password>",
-	}
+	ssh := &easyssh.MakeConfig{User: "user1", Server: "server.example.com", Password: "<user1password>"}
 
 	// Call Scp method with file you want to upload to remote server.
 	err := ssh.Scp("/home/linuxpro/GO/src/goclientssh.go")
