@@ -7,16 +7,14 @@ package easyssh
 import (
 	"bufio"
 	"fmt"
+	"golang.org/x/crypto/ssh"
 	"io"
 	"io/ioutil"
-	"net"
 	"os"
-	"os/user"
 	"path/filepath"
-
-	"golang.org/x/crypto/ssh"
-	"golang.org/x/crypto/ssh/agent"
 )
+
+var keyMap map[string][]byte = make(map[string][]byte)
 
 // Contains main authority information.
 // User field should be a name of user on remote server (ex. john in ssh john@example.com).
@@ -35,24 +33,23 @@ type MakeConfig struct {
 
 // returns ssh.Signer from user you running app home path + cutted key path.
 // (ex. pubkey,err := getKeyFile("/.ssh/id_rsa") )
-func getKeyFile(keypath string) (ssh.Signer, error) {
-	usr, err := user.Current()
+func getKeyFile(keypath string) (pubkey ssh.Signer, err error) {
+	var buf []byte
+	var ok bool
+	if buf, ok = keyMap[keypath]; !ok {
+		file := keypath
+		buf, err = ioutil.ReadFile(file)
+		if err != nil {
+			return nil, err
+		}
+		keyMap[keypath] = buf
+	}
+	pubkey, err = ssh.ParsePrivateKey(buf)
 	if err != nil {
 		return nil, err
 	}
-
-	file := usr.HomeDir + keypath
-	buf, err := ioutil.ReadFile(file)
-	if err != nil {
-		return nil, err
-	}
-
-	pubkey, err := ssh.ParsePrivateKey(buf)
-	if err != nil {
-		return nil, err
-	}
-
 	return pubkey, nil
+
 }
 
 // connects to remote server using MakeConfig struct and returns *ssh.Session
@@ -64,26 +61,25 @@ func (ssh_conf *MakeConfig) connect() (*ssh.Session, error) {
 	if ssh_conf.Password != "" {
 		auths = append(auths, ssh.Password(ssh_conf.Password))
 	}
-	
+
 	// Default port 22
 	if ssh_conf.Port == "" {
 		ssh_conf.Port = "22"
 	}
-	
+
 	// Default current user
 	if ssh_conf.User == "" {
 		ssh_conf.User = os.Getenv("USER")
 	}
 
-	if sshAgent, err := net.Dial("unix", os.Getenv("SSH_AUTH_SOCK")); err == nil {
-		auths = append(auths, ssh.PublicKeysCallback(agent.NewClient(sshAgent).Signers))
-		defer sshAgent.Close()
-	}
+	//	if sshAgent, err := net.Dial("unix", os.Getenv("SSH_AUTH_SOCK")); err == nil {
+	//		auths = append(auths, ssh.PublicKeysCallback(agent.NewClient(sshAgent).Signers))
+	//		defer sshAgent.Close()
+	//	}
 
 	if pubkey, err := getKeyFile(ssh_conf.Key); err == nil {
 		auths = append(auths, ssh.PublicKeys(pubkey))
 	}
-
 	config := &ssh.ClientConfig{
 		User: ssh_conf.User,
 		Auth: auths,
@@ -111,7 +107,6 @@ func (ssh_conf *MakeConfig) Stream(command string) (output chan string, done cha
 	if err != nil {
 		return output, done, err
 	}
-	// connect to both outputs (they are of type io.Reader)
 	outReader, err := session.StdoutPipe()
 	if err != nil {
 		return output, done, err
