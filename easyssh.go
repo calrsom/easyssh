@@ -69,6 +69,11 @@ func (ssh_conf *MakeConfig) connect() (*ssh.Session, error) {
 	if ssh_conf.Port == "" {
 		ssh_conf.Port = "22"
 	}
+	
+	// Default current user
+	if ssh_conf.User == "" {
+		ssh_conf.User = os.Getenv("USER")
+	}
 
 	if sshAgent, err := net.Dial("unix", os.Getenv("SSH_AUTH_SOCK")); err == nil {
 		auths = append(auths, ssh.PublicKeysCallback(agent.NewClient(sshAgent).Signers))
