@@ -64,6 +64,11 @@ func (ssh_conf *MakeConfig) connect() (*ssh.Session, error) {
 	if ssh_conf.Password != "" {
 		auths = append(auths, ssh.Password(ssh_conf.Password))
 	}
+	
+	// Default port 22
+	if ssh_conf.Port == "" {
+		ssh_conf.Port = "22"
+	}
 
 	if sshAgent, err := net.Dial("unix", os.Getenv("SSH_AUTH_SOCK")); err == nil {
 		auths = append(auths, ssh.PublicKeysCallback(agent.NewClient(sshAgent).Signers))
