@@ -188,7 +188,7 @@ func (ssh_conf *MakeConfig) Scp(sourceFile string, destDir string) error {
 		}
 	}()
 
-	if err := session.Run(fmt.Sprintf("scp -t %s", destDir + "/" + targetFile)); err != nil {
+	if err := session.Run(fmt.Sprintf("scp -t %s", destDir+"/"+targetFile)); err != nil {
 		return err
 	}
 
