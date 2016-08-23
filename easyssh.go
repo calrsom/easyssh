@@ -29,6 +29,7 @@ type MakeConfig struct {
 	Key      string
 	Port     string
 	Password string
+	EnablePTY bool
 }
 
 // returns ssh.Signer from user you running app home path + cutted key path.
@@ -93,6 +94,19 @@ func (ssh_conf *MakeConfig) connect() (*ssh.Session, error) {
 	session, err := client.NewSession()
 	if err != nil {
 		return nil, err
+	}
+
+	if ssh_conf.EnablePTY {
+		modes := ssh.TerminalModes{
+			ssh.ECHO:          0,
+			ssh.TTY_OP_ISPEED: 144000,
+			ssh.TTY_OP_OSPEED: 144000,
+		}
+
+		if err := session.RequestPty("xterm", 0, 0, modes); err != nil {
+			session.Close()
+			return nil, err
+		}
 	}
 
 	return session, nil
