@@ -24,14 +24,14 @@ var keyMap map[string][]byte = make(map[string][]byte)
 // Note: easyssh looking for private key in user's home directory (ex. /home/john + Key).
 // Then ensure your Key begins from '/' (ex. /.ssh/id_rsa)
 type MakeConfig struct {
-	User              string
-	Server            string
-	Key               string
-	Port              string
-	Password          string
-	EnablePTY         bool
-	Update 		bool
-	client *ssh.Client
+	User      string
+	Server    string
+	Key       string
+	Port      string
+	Password  string
+	EnablePTY bool
+	Update    bool
+	client    *ssh.Client
 }
 
 // returns ssh.Signer from user you running app home path + cutted key path.
@@ -163,7 +163,11 @@ func (ssh_conf *MakeConfig) Stream(command string) (output chan string, done cha
 func (ssh_conf *MakeConfig) Run(command string) (outStr, errStr string, err error) {
 	outChan, doneChan, err, _ := ssh_conf.Stream(command)
 	if err != nil {
-		return outStr, errStr, err
+		ssh_conf.Update = true
+		outChan, doneChan, err, _ = ssh_conf.Stream(command)
+		if err != nil {
+			return outStr, errStr, err
+		}
 	}
 	// read from the output channel until the done signal is passed
 	stillGoing := true
