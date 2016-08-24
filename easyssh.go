@@ -24,12 +24,14 @@ var keyMap map[string][]byte = make(map[string][]byte)
 // Note: easyssh looking for private key in user's home directory (ex. /home/john + Key).
 // Then ensure your Key begins from '/' (ex. /.ssh/id_rsa)
 type MakeConfig struct {
-	User     string
-	Server   string
-	Key      string
-	Port     string
-	Password string
-	EnablePTY bool
+	User              string
+	Server            string
+	Key               string
+	Port              string
+	Password          string
+	EnablePTY         bool
+	Update 		bool
+	client *ssh.Client
 }
 
 // returns ssh.Signer from user you running app home path + cutted key path.
@@ -81,17 +83,25 @@ func (ssh_conf *MakeConfig) connect() (*ssh.Session, error) {
 	if pubkey, err := getKeyFile(ssh_conf.Key); err == nil {
 		auths = append(auths, ssh.PublicKeys(pubkey))
 	}
+
 	config := &ssh.ClientConfig{
 		User: ssh_conf.User,
 		Auth: auths,
 	}
 
-	client, err := ssh.Dial("tcp", ssh_conf.Server+":"+ssh_conf.Port, config)
-	if err != nil {
-		return nil, err
+	if ssh_conf.Update {
+		if ssh_conf.client != nil {
+			ssh_conf.client.Close()
+		}
+		var err error
+		ssh_conf.client, err = ssh.Dial("tcp", ssh_conf.Server + ":" + ssh_conf.Port, config)
+		if err != nil {
+			return nil, err
+		}
+		ssh_conf.Update = false
 	}
 
-	session, err := client.NewSession()
+	session, err := ssh_conf.client.NewSession()
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +113,7 @@ func (ssh_conf *MakeConfig) connect() (*ssh.Session, error) {
 			ssh.TTY_OP_OSPEED: 144000,
 		}
 
-		if err := session.RequestPty("xterm", 0, 0, modes); err != nil {
+		if err := session.RequestPty("xterm", 1024, 1024, modes); err != nil {
 			session.Close()
 			return nil, err
 		}
@@ -115,23 +125,23 @@ func (ssh_conf *MakeConfig) connect() (*ssh.Session, error) {
 // Stream returns one channel that combines the stdout and stderr of the command
 // as it is run on the remote machine, and another that sends true when the
 // command is done. The sessions and channels will then be closed.
-func (ssh_conf *MakeConfig) Stream(command string) (output chan string, done chan bool, err error) {
+func (ssh_conf *MakeConfig) Stream(command string) (output chan string, done chan bool, err, sessionErr error) {
 	// connect to remote host
 	session, err := ssh_conf.connect()
 	if err != nil {
-		return output, done, err
+		return output, done, err, sessionErr
 	}
 	outReader, err := session.StdoutPipe()
 	if err != nil {
-		return output, done, err
+		return output, done, err, sessionErr
 	}
 	errReader, err := session.StderrPipe()
 	if err != nil {
-		return output, done, err
+		return output, done, err, sessionErr
 	}
 	// combine outputs, create a line-by-line scanner
 	outputReader := io.MultiReader(outReader, errReader)
-	err = session.Start(command)
+	sessionErr = session.Run(command)
 	scanner := bufio.NewScanner(outputReader)
 	// continuously send the command's output over the channel
 	outputChan := make(chan string)
@@ -146,14 +156,14 @@ func (ssh_conf *MakeConfig) Stream(command string) (output chan string, done cha
 		done <- true
 		session.Close()
 	}(scanner, outputChan, done)
-	return outputChan, done, err
+	return outputChan, done, err, sessionErr
 }
 
 // Runs command on remote machine and returns its stdout as a string
-func (ssh_conf *MakeConfig) Run(command string) (outStr string, err error) {
-	outChan, doneChan, err := ssh_conf.Stream(command)
+func (ssh_conf *MakeConfig) Run(command string) (outStr, errStr string, err error) {
+	outChan, doneChan, err, _ := ssh_conf.Stream(command)
 	if err != nil {
-		return outStr, err
+		return outStr, errStr, err
 	}
 	// read from the output channel until the done signal is passed
 	stillGoing := true
@@ -165,8 +175,14 @@ func (ssh_conf *MakeConfig) Run(command string) (outStr string, err error) {
 			outStr += line + "\n"
 		}
 	}
+	/*
+	if sessionErr != nil && outStr != "" {
+		errStr = outStr
+		outStr = ""
+	}
+	*/
 	// return the concatenation of all signals from the output channel
-	return outStr, err
+	return outStr, errStr, err
 }
 
 // Scp uploads sourceFile to remote machine like native scp console app.
