@@ -63,6 +63,15 @@ func (ssh_conf *MakeConfig) connect() (*ssh.Session, error) {
 	// figure out what auths are requested, what is supported
 	if ssh_conf.Password != "" {
 		auths = append(auths, ssh.Password(ssh_conf.Password))
+
+		auths = append(auths, ssh.KeyboardInteractive(func(user, instruction string, questions []string, echos []bool) ([]string, error) {
+			// Just send the password back for all questions
+			answers := make([]string, len(questions))
+			for i, _ := range answers {
+				answers[i] = ssh_conf.Password // replace this
+			}
+			return answers, nil
+		}))
 	}
 
 	// Default port 22
@@ -94,7 +103,7 @@ func (ssh_conf *MakeConfig) connect() (*ssh.Session, error) {
 			ssh_conf.client.Close()
 		}
 		var err error
-		ssh_conf.client, err = ssh.Dial("tcp", ssh_conf.Server + ":" + ssh_conf.Port, config)
+		ssh_conf.client, err = ssh.Dial("tcp", ssh_conf.Server+":"+ssh_conf.Port, config)
 		if err != nil {
 			return nil, err
 		}
@@ -180,10 +189,10 @@ func (ssh_conf *MakeConfig) Run(command string) (outStr, errStr string, err erro
 		}
 	}
 	/*
-	if sessionErr != nil && outStr != "" {
-		errStr = outStr
-		outStr = ""
-	}
+		if sessionErr != nil && outStr != "" {
+			errStr = outStr
+			outStr = ""
+		}
 	*/
 	// return the concatenation of all signals from the output channel
 	return outStr, errStr, err
