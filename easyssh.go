@@ -98,7 +98,7 @@ func (ssh_conf *MakeConfig) connect() (*ssh.Session, error) {
 		Auth: auths,
 	}
 
-	if ssh_conf.Update {
+	if ssh_conf.client == nil || ssh_conf.Update {
 		if ssh_conf.client != nil {
 			ssh_conf.client.Close()
 		}
@@ -200,7 +200,6 @@ func (ssh_conf *MakeConfig) Run(command string) (outStr, errStr string, err erro
 
 // Scp uploads sourceFile to remote machine like native scp console app.
 func (ssh_conf *MakeConfig) Scp(sourceFile string, destDir string) error {
-	ssh_conf.Update = true
 	session, err := ssh_conf.connect()
 
 	if err != nil {
