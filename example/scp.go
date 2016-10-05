@@ -7,10 +7,10 @@ import (
 func main() {
 	// Create MakeConfig instance with remote username, server address and path to private key.
 	ssh := &easyssh.MakeConfig{
-		User:   "root",
-		Server: "10.1.1.10",
-		Key:    "TjSDBkAu",
-		Port:   "22",
+		Server:   "10.1.1.10",
+		Port:     "22",
+		User:     "root",
+		Password: "TjSDBkAu",
 	}
 
 	// Call Scp method with file you want to upload to remote server.
@@ -23,6 +23,14 @@ func main() {
 		println("success")
 
 		response, _, _ := ssh.Run("ls -al run.go")
+
+		print(response)
+
+		response, _, _ = ssh.Run("rm run.go")
+
+		print(response)
+
+		response, _, _ = ssh.Run("ls -al run.go")
 
 		print(response)
 	}

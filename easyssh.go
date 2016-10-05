@@ -200,6 +200,7 @@ func (ssh_conf *MakeConfig) Run(command string) (outStr, errStr string, err erro
 
 // Scp uploads sourceFile to remote machine like native scp console app.
 func (ssh_conf *MakeConfig) Scp(sourceFile string, destDir string) error {
+	ssh_conf.Update = true
 	session, err := ssh_conf.connect()
 
 	if err != nil {
